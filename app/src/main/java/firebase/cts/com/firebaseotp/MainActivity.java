@@ -1,5 +1,7 @@
 package firebase.cts.com.firebaseotp;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -23,8 +25,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -113,7 +113,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "signInWithCredential:success");
-                            updateLocation(11.1111, 24.11111);
+                            SharedPreferences.Editor pref = getSharedPreferences("Location", MODE_PRIVATE).edit();
+                            pref.putString("email", mEmail.getText().toString().trim());
+                            pref.apply();
+                            //updateLocation(11.1111, 24.11111);
+                            Intent intent  = new Intent(MainActivity.this, LocationUpdate.class);
+                            startActivity(intent);
+                            finish();
                             /////Location Screen TODO
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -137,12 +143,6 @@ public class MainActivity extends AppCompatActivity {
         return  user;
     }
 
-    public void updateLocation(double latValue, double longValue){
-        String email = modifyString(mEmail.getText().toString().trim());
-        Map<String, Object> values = new HashMap<>();
-        values.put("lat", latValue);
-        values.put("lng", longValue);
-        getCurrentUserReference(email).child("location").updateChildren(values);
-    }
+
 
 }
